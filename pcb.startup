@@ -16,4 +16,4 @@ echo "admin:admin" | chpasswd
 apt update && apt -y install ftp
 
 # On ajoute un alias pour faciliter la connexion au serveur FTP
-echo "alias 'conn-sf-ftp=ftp -p 172.16.192.1'" > ~/.bashrc
+echo "alias conn-sf-ftp='ftp -p 172.16.192.1'" >> /home/admin/.bashrc
