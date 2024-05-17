@@ -61,10 +61,175 @@ La personne qui utilise le `pcb` est souvent avec les clients. Elle se rend comp
 
 ## Questions
 
+### 1. Préparer la simulation Kathara
+
+![Figure 3 : Proposition d'architecture](./assets/architecture_proposition.png)
+
+#### a.
+
+> Trouvez les sous-plages pour la zone personnel
+
+- Zone "personnel" : `172.16.196.0/22` allant de `172.16.196.1` à `172.16.199.254` pouvant contenir 1022 machines.
+- Zone "clients" : `172.16.194.0/23` allant de `172.16.194.1` à `172.16.195.254` pouvant contenir 510 machines.
+
+> Les adresses des machines dans la *Figure 2*
+
+- `r` (`eth0`) : `172.16.193.1/25`
+- `r` (`eth1`) : `172.16.192.129/25`
+- `r` (`eth2`) : `172.16.193.129/25`
+
+- `r_s` (`eth0`) : `172.16.192.126/25`
+- `r_s` (`eth1`) : `172.16.193.130/25` (relié au sous-réseau de `r` sur son interface `eth2`)
+
+- `r_p` (`eth0`) : `172.16.199.254/22`
+- `r_p` (`eth1`) : `172.16.193.2/25` (relié au sous-réseau de `r` sur son interface `eth0`)
+
+- `r_c` (`eth0`) : `172.16.195.254/23`
+- `r_c` (`eth1`) : `172.16.192.130/25` (relié au sous-réseau de `r` sur son interface `eth1`)
+
+- `pca` (`eth0`) : `172.16.196.1/22` (dans le réseau de `r_p` sur son interface `eth0`)
+- `pcb` (`eth0`) : `172.16.196.2/22` (dans le réseau de `r_p` sur son interface `eth0`)
+
+- `pcc` (`eth0`) et `pcd` (`eth0`) : *dynamiquement grâce au DHCP configuré sur `r_c`*
+
+- `sf` (`eth0`) : `172.16.192.1/25` (dans le réseau de `r_s` sur son interface `eth0`)
+
+> La plage DHCP nécessaire
+
+La plage DHCP doit accueillir un nombre de 200 machines,
+alors la plage ira de `172.16.194.1` à `172.16.194.201` (avec un `netmask` de `255.255.254.0`).
+
+#### b.
+
+> Trouvez égalemennt des sous-plages pour la plage des routeurs...
+
+- Allant de `r` à `r_s` : `172.16.193.128/25`
+- Allant de `r` à `r_p` : `172.16.193.0/25`
+- Allant de `r` à `r_c` : `172.16.192.128/25`
+
+> ...et celle de la zone "serveurs".
+
+- Zone "serveurs" : `172.16.192.0/25` allant de `172.16.192.1` à `172.16.192.126` pouvant contenir 126 machines.
+
+#### c.
+
+> Analysez comment le routage sera réalisé dans l'architecture décrite, quelles commandes devont être mises sur quelles machines ?
+
+Il faudra faire du routage sur chaque machine avec `ip route`, par exemple.
+
+Concernant le serveur DHCP, il faudra :
+- Installer `isc-dhcp-server` avec `apt`
+  - `apt update && apt install -y isc-dhcp-server`
+- Démarrer le service `isc-dhcp-server` après configuration via `systemctl`
+  - `systemctl enable --now isc-dhcp-server`
+
+Concernant le serveur FTP, il faudra installer `vsftpd` avec `apt`. Il faudra aussi configurer un utilisateur pour avoir un accès au FTP.
+Une fois la configuration terminée, il faudra aussi démarrer son service `vsftpd`.
+
+#### d.
+
+> Pour le service DHCP, comment mettre en place le service en question ? Préparez le contenu des fichiers de configuration.
+
+Sur la machine `r_c`, il faudra modifier le fichier de configuration du serveur DHCP situé à `/etc/dhcp/dhcpd.conf` pour y écrire le contenu suivant :
+```conf
+ddns-update-style none;
+
+# Réseau de `r_c` : "172.16.194.0/23".
+subnet 172.16.194.0 netmask 255.255.254.0 {
+    # Doit fonctionner pour 200 machines.
+	range 172.16.194.1 172.16.194.201;
+	option routers 172.16.195.254;
+
+    # Nom de serveurs (pour ne pas avoir à configurer "resolv.conf" sur les machines)
+    option domain-name-servers 9.9.9.9;
+
+    # Durée du bail de l'adresse
+    default-lease-time 21600;
+    max-lease-time 43200;
+}
+```
+
+Pour les machines `pcc` et `pcd` qui vont utiliser le DHCP, il faudra exécuter la commande : `dhclient -v eth0`.
+
+#### e.
+
+> Quels service allez-vous mettre en place pour que la machine `pcb` puisse déposer et retirer des fichiers ?
+
+Nous allons mettre en place un service FTP : `vsftpd` (Very Secure FTP Daemon) sur la machine `sf`.
+
+La machine `pcb` pourra ainsi accéder au service en utilisant la commande `ftp`.
+
+> Quels service pour l'accès à distance ?
+
+Nous utiliserons SSH.
+
+#### f.
+
+Il faudra configurer :
+- les interfaces (`/etc/network/interfaces`) de chaque machine ;
+- le service DHCP sur la machine `r_c` ;
+- le service FTP sur la machine `sf` ;
+- le service SSH sur la machine `pcb`.
+
 ### 2.
 
-[Voir le lab.conf](./lab.conf)
+> Préparer l'émulation Kathara.
+
+[Voir le fichier `lab.conf`](./lab.conf)
 
 ### 3.
 
-Dans les `resolv.conf`, on utilise le serveur DNS de [Quad9](https://github.com/Quad9DNS) à la place de ceux de Google ou de Cloudflare.
+> Mettre en place une configuration pérenne.
+
+[Voir le dossier `shared`](./shared/)
+
+### 4.
+
+> Sur la machine `pcb` mettez en place les instructions qui vous permettront d'installer le service demandé.
+
+```bash
+# SSH étant déjà installé, on a juste à démarrer le serveur
+systemctl start sshd
+```
+
+> Créez sur la machine `pcb` un utilisateur `admin` qui aura le mot de passe de votre choix.
+
+```bash
+useradd -m admin
+# Ici, le mot de passe sera "admin".
+echo "admin:admin" | chpasswd
+```
+
+### 5.
+
+> Mettez en place le service FTP sur la machine `sf`.
+
+```bash
+# on ajoute notre utilisateur
+useradd -m admin
+echo "admin:admin" | chpasswd
+
+# on installe le service
+apt update && apt install -y vsftpd
+# on démarre le service
+/etc/init.d/vsftpd start 
+```
+
+### 6.
+
+> A partir de ce moment, les tests suivant doivent marcher :
+
+- [ ] Toutes les machines peuvent joindre l'Internet (par adresse IP et par nom de domaine)
+- [ ] Toutes les machines peuvent communiquer les unes avec les autres
+- [ ] La configuration DHCP demandée est correcte (l'adresse du routeur ne change pas, malgré l'attribution DHCP, les adresses de PCC et PCD sont dans la bonne plage) et le serveur est à l'écoute
+- [ ] Le service SSH `pcb` est démarré et à l'écoute, et permet l'établissement du tunnel sécurisé demandé à partir de toute autre machine
+- [ ] Le service FTP sur `sf` est configuré, démarré et à l'écoute et permet le transfert de fichiers
+
+### 7.
+
+> Ouvrez une capture Wireshark sur l'interface faisant le pont de la machine hôte avec Kathara.
+> Avec la machine hôte, connectez vous à la machine `pcb` en SSH, puis fermez la connexion.
+> Ensuite, en étant connecté à distance, faites un transfert de fichiers sur `sf` puis récupérez un autre fichier à partir de `sf`
+>
+> A partir de cette capture, retrouvez le fonctionnement des deux protocoles utilisés (SSH et FTP).
+
