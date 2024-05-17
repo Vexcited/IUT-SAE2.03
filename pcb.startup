@@ -6,7 +6,7 @@ cp /shared/pcb/interfaces /etc/network/interfaces
 /etc/init.d/networking restart
 
 # On démarre et active le service SSH
-systemctl enable --now sshd
+systemctl start sshd
 
 # On ajoute l'utilisateur "admin" avec le mot de passe "admin".
 useradd -m admin

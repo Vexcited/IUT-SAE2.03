@@ -1,0 +1,6 @@
+# On utilise uniquement les configurations requises (IPv4)
+DHCPDv4_CONF=/etc/dhcp/dhcpd.conf
+DHCPDv4_PID=/var/run/dhcpd.pid
+
+# On écoute sur l'interface "eth0".
+INTERFACESv4="eth0"

@@ -5,4 +5,12 @@ cp /shared/r_c/interfaces /etc/network/interfaces
 # On redémarre le service réseau.
 /etc/init.d/networking restart
 
-# TODO: FINISH
+# On installe le serveur DHCP.
+apt update && apt install -y isc-dhcp-server
+
+# On copie la configuration du serveur DHCP
+cp /shared/r_c/dhcpd.conf /etc/dhcp/dhcpd.conf
+cp /shared/r_c/isc-dhcp-server /etc/default/isc-dhcp-server
+
+# On démarre le service DHCP.
+/etc/init.d/dhcp start

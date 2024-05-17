@@ -136,17 +136,22 @@ ddns-update-style none;
 
 # Réseau de `r_c` : "172.16.194.0/23".
 subnet 172.16.194.0 netmask 255.255.254.0 {
-  # Doit fonctionner pour 200 machines.
   range 172.16.194.1 172.16.194.201;
   option routers 172.16.195.254;
-
-  # Nom de serveurs (pour ne pas avoir à configurer "resolv.conf" sur les machines)
   option domain-name-servers 9.9.9.9;
-
-  # Durée du bail de l'adresse
   default-lease-time 21600;
   max-lease-time 43200;
 }
+```
+
+Il y a aussi le fichier situé à `/etc/default/isc-dhcp-server` qu'il faut éditer :
+```bash
+# On utilise uniquement les configurations requises (IPv4)
+DHCPDv4_CONF=/etc/dhcp/dhcpd.conf
+DHCPDv4_PID=/var/run/dhcpd.pid
+
+# On écoute sur l'interface "eth0".
+INTERFACESv4="eth0"
 ```
 
 Pour les machines `pcc` et `pcd` qui vont utiliser le DHCP, il faudra exécuter la commande : `dhclient -v eth0`.
