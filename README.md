@@ -165,11 +165,17 @@ Nous utiliserons SSH.
 
 #### f.
 
+> Quelles seront les configurations à faire sur chacune des machines ?
+
 Il faudra configurer :
 - les interfaces (`/etc/network/interfaces`) de chaque machine ;
 - le service DHCP sur la machine `r_c` ;
 - le service FTP sur la machine `sf` ;
 - le service SSH sur la machine `pcb`.
+
+> Comment allez vous les mettre en place ?
+
+En utilisant des fichiers `.startup` qui seront exécutés lors du démarrage de la simulation Kathara.
 
 ### 2.
 
