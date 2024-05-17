@@ -1,5 +1,5 @@
 # On copie les fichiers de configuration initial.
-cp /shared/pcd/interfaces /etc/network/interfaces
+cp /shared/pc_dhcp/interfaces /etc/network/interfaces
 
 # On redémarre le service réseau.
 /etc/init.d/networking restart
