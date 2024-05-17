@@ -1,0 +1,8 @@
+# On copie les fichiers de configuration initial.
+cp /shared/resolv.conf /etc/resolv.conf
+cp /shared/r/interfaces /etc/network/interfaces
+
+# On redémarre le service réseau.
+/etc/init.d/networking restart
+
+iptables -t nat -A POSTROUTING -o eth3 -j MASQUERADE

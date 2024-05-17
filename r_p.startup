@@ -1,0 +1,6 @@
+# On copie les fichiers de configuration initial.
+cp /shared/resolv.conf /etc/resolv.conf
+cp /shared/r_p/interfaces /etc/network/interfaces
+
+# On redémarre le service réseau.
+/etc/init.d/networking restart

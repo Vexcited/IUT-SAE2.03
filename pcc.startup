@@ -1,0 +1,5 @@
+# On copie les fichiers de configuration initial.
+cp /shared/pcc/interfaces /etc/network/interfaces
+
+# On redémarre le service réseau.
+/etc/init.d/networking restart

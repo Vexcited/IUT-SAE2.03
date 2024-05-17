@@ -1,0 +1,20 @@
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+address 172.16.193.1
+netmask 255.255.255.128
+post-up ip route add 172.16.196.0/22 via 172.16.193.2
+
+auto eth1
+iface eth1 inet static
+address 172.16.192.129
+netmask 255.255.255.128
+post-up ip route add 172.16.194.0/23 via 172.16.192.130
+
+auto eth2
+iface eth2 inet static
+address 172.16.193.129
+netmask 255.255.255.128
+post-up ip route add 172.16.192.0/23 via 172.16.193.130
