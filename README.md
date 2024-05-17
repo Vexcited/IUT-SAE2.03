@@ -235,10 +235,10 @@ Voir la configuration [`/etc/vsftpd.conf`](./shared/sf/vsftpd.conf).
 - [x] Toutes les machines peuvent joindre l'Internet
   - [x] Par nom de domaine
   - [x] Par adresse IP
-- [ ] Toutes les machines peuvent communiquer les unes avec les autres
-- [ ] La configuration DHCP demandée est correcte (l'adresse du routeur ne change pas, malgré l'attribution DHCP, les adresses de PCC et PCD sont dans la bonne plage) et le serveur est à l'écoute
-- [ ] Le service SSH `pcb` est démarré et à l'écoute, et permet l'établissement du tunnel sécurisé demandé à partir de toute autre machine
-- [ ] Le service FTP sur `sf` est configuré, démarré et à l'écoute et permet le transfert de fichiers
+- [x] Toutes les machines peuvent communiquer les unes avec les autres
+- [x] La configuration DHCP demandée est correcte (l'adresse du routeur ne change pas, malgré l'attribution DHCP, les adresses de PCC et PCD sont dans la bonne plage) et le serveur est à l'écoute
+- [x] Le service SSH `pcb` est démarré et à l'écoute, et permet l'établissement du tunnel sécurisé demandé à partir de toute autre machine
+- [x] Le service FTP sur `sf` est configuré, démarré et à l'écoute et permet le transfert de fichiers
 
 ### 7.
 
