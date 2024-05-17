@@ -5,4 +5,15 @@ cp /shared/sf/interfaces /etc/network/interfaces
 # On redémarre le service réseau.
 /etc/init.d/networking restart
 
-# TODO: FINISH
+# On ajoute l'utilisateur qui accèdera au client FTP.
+useradd -m admin
+echo "admin:admin" | chpasswd
+
+# On installe le service FTP.
+apt update && apt install -y vsftpd
+
+# On ajoute la configuration du service FTP.
+cp /shared/sf/vsftpd.conf /etc/vsftpd.conf
+
+# On démarre le service FTP.
+/etc/init.d/vsftpd start
