@@ -13,4 +13,4 @@ cp /shared/r_c/dhcpd.conf /etc/dhcp/dhcpd.conf
 cp /shared/r_c/isc-dhcp-server /etc/default/isc-dhcp-server
 
 # On démarre le service DHCP.
-/etc/init.d/dhcp start
+systemctl start isc-dhcp-server
