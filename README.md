@@ -140,12 +140,12 @@ subnet 172.16.194.0 netmask 255.255.254.0 {
 	range 172.16.194.1 172.16.194.201;
 	option routers 172.16.195.254;
 
-    # Nom de serveurs (pour ne pas avoir à configurer "resolv.conf" sur les machines)
-    option domain-name-servers 9.9.9.9;
+  # Nom de serveurs (pour ne pas avoir à configurer "resolv.conf" sur les machines)
+  option domain-name-servers 9.9.9.9;
 
-    # Durée du bail de l'adresse
-    default-lease-time 21600;
-    max-lease-time 43200;
+  # Durée du bail de l'adresse
+  default-lease-time 21600;
+  max-lease-time 43200;
 }
 ```
 
