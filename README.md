@@ -226,11 +226,15 @@ apt update && apt install -y vsftpd
 /etc/init.d/vsftpd start 
 ```
 
+Voir la configuration [`/etc/vsftpd.conf`](./shared/sf/vsftpd.conf).
+
 ### 6.
 
 > A partir de ce moment, les tests suivant doivent marcher :
 
-- [ ] Toutes les machines peuvent joindre l'Internet (par adresse IP et par nom de domaine)
+- [x] Toutes les machines peuvent joindre l'Internet
+  - [x] Par nom de domaine
+  - [x] Par adresse IP
 - [ ] Toutes les machines peuvent communiquer les unes avec les autres
 - [ ] La configuration DHCP demandée est correcte (l'adresse du routeur ne change pas, malgré l'attribution DHCP, les adresses de PCC et PCD sont dans la bonne plage) et le serveur est à l'écoute
 - [ ] Le service SSH `pcb` est démarré et à l'écoute, et permet l'établissement du tunnel sécurisé demandé à partir de toute autre machine
