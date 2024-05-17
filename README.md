@@ -136,9 +136,9 @@ ddns-update-style none;
 
 # Réseau de `r_c` : "172.16.194.0/23".
 subnet 172.16.194.0 netmask 255.255.254.0 {
-    # Doit fonctionner pour 200 machines.
-	range 172.16.194.1 172.16.194.201;
-	option routers 172.16.195.254;
+  # Doit fonctionner pour 200 machines.
+  range 172.16.194.1 172.16.194.201;
+  option routers 172.16.195.254;
 
   # Nom de serveurs (pour ne pas avoir à configurer "resolv.conf" sur les machines)
   option domain-name-servers 9.9.9.9;
