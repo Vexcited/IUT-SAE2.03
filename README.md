@@ -293,8 +293,9 @@ echo "Hello world from sf!" > /home/admin/flag.txt
 
 On va transférer ce fichier en FTP avec la commande `ftp`.
 
-```ftp
-ftp 172.16.192.1
+```console
+$ ftp 172.16.192.1
+
 Connected to 172.16.192.1.
 220 (vsFTPd 3.0.3)
 Name (172.16.192.1:iut): admin
