@@ -293,14 +293,28 @@ echo "Hello world from sf!" > /home/admin/flag.txt
 
 On va transférer ce fichier en FTP avec la commande `ftp`.
 
-```bash
+```ftp
 ftp 172.16.192.1
-> Username: admin
-> Password: admin
-# on transfère le fichier local dans /home/admin/ftp_example.txt
-$ put /ftp_example.txt
-# on récupère un fichier de la machine sf pour la mettre en local
-$ get flag.txt
-# on referme
-$ bye
+Connected to 172.16.192.1.
+220 (vsFTPd 3.0.3)
+Name (172.16.192.1:iut): admin
+331 Please specify the password.
+Password:
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> put /ftp_example.txt
+local: /ftp_example.txt remote: /ftp_example.txt
+200 PORT command successful. Consider using PASV.
+150 Ok to send data.
+226 Transfer complete.
+12 bytes sent in 0.00 secs (133.1676 kB/s)
+ftp> get flag.txt
+local: flag.txt remote: flag.txt
+200 PORT command successful. Consider using PASV.
+150 Opening BINARY mode data connection for flag.txt (21 bytes).
+226 Transfer complete.
+21 bytes received in 0.00 secs (49.5358 kB/s)
+ftp> bye
+221 Goodbye.
 ```
