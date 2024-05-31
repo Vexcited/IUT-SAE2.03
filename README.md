@@ -1,5 +1,7 @@
 # SAE2.03 : Installation de services réseau (Sujet 2)
 
+> Notre rapport se trouve dans le fichier [`REPORT.md`](./REPORT.md).
+
 ## Compétence (3)
 
 **Administrer des systèmes informatiques communicants complexes**, avec les composantes essentielles suivantes :
@@ -275,7 +277,7 @@ On va devoir établir une route entre la machine hôte (VM) et la machine `r_s` 
 
 ```bash
 # On obtient 172.17.0.2 avec l'interface eth3 sur la machine r.
-# On tappe cette commande sur la machine hôte.
+# On tape cette commande sur la machine hôte.
 sudo ip route add 172.16.192.0/25 via 172.17.0.2
 ```
 
@@ -319,3 +321,12 @@ local: flag.txt remote: flag.txt
 ftp> bye
 221 Goodbye.
 ```
+
+Pour effectuer les captures, on peut utiliser la commande suivante :
+
+```bash
+# On va capturer le trafic sur l'interface eth3 de la machine hôte.
+sudo tcpdump -i docker0 -w ./nom_fichier_capture.pcap
+```
+
+Vous pouvez retrouver les captures dans le dossier [`wireshark`](./wireshark).
