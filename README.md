@@ -4,7 +4,7 @@
 
 **Administrer des systèmes informatiques communicants complexes**, avec les composantes essentielles suivantes :
 
-- En maitrisant l'architecture des sytèmes et des réseaux
+- En maîtrisant l'architecture des systèmes et des réseaux
 - En sécurisant le système d'information
 - En appliquant les obligations légales, les normes en vigueur et les bonnes pratiques
 - En mettant en oeuvre les mesures correctives adaptées à la nature des incidents identifiés
@@ -13,7 +13,7 @@
 
 ## Contexte
 
-Une entreprise qui fait un développement possède une plage publiqe d'adresses IP assez petite : **164.81.118.0/24**.
+Une entreprise qui fait un développement possède une plage publique d'adresses IP assez petite : **164.81.118.0/24**.
 Cette plage est déjà configurée dans l'entreprise (elle correspond en réalité à une sous-plage d'adresses de notre infrastructure à l'Université de Limoges).
 Vous n'aurez aucune modification à faire à cette configuration, vous la prenez telle-quelle.
 Par contre, ce que vous allez devoir configurer est une infrastructure interne privée, qui sera liée à cette plage publique.
@@ -24,44 +24,48 @@ L'entreprise choisit d'utiliser une plage privée : P1.P2.P3.P4/n1 (**172.16.192
 - (au minimum) **950** adresses machine seront utilisées dabs la **zone personnel**
 - (au minimum) **350** adresses machine seront utilisées dans la **zone clients**
 
-En plus, l'entreprise aura besoin de 2 plages d'adresses privées supplémentaires (que vuos allez devoir choisir vous-mêmes, en argumentant vos choix) :
+En plus, l'entreprise aura besoin de 2 plages d'adresses privées supplémentaires (que vous allez devoir choisir vous-mêmes, en argumentant vos choix) :
 
 - Une sous-plage d'adresses qui connecte les routeurs
 - Une plage d'adresses de taille au moins 10 pour la "zone serveurs" qui contient les serveurs de l'entreprise
 
-Avant d'être déployée, la configuration sera émulée et testée dans un outil dédié, pour s'assurer de son bon fonctionnement. Cet outil d'émulation est Kathara.
+Avant d'être déployée, la configuration sera émulée et testée dans un outil dédié, pour s'assurer de son bon fonctionnement. Cet outil d'émulation est Kathará.
 
 ![Figure 1 : L'architecture à haut niveau](./assets/architecture_high_level.png)
 
-L'entreprise envisage d'utiliser l'architecture représentée dans cette figure. Votre machine physique sera la machine M, dans laquelle une machine virtuelle Kathara (notée VM dans la figure) sera active. La machine M a des adresses IP et du routage configurés.
+L'entreprise envisage d'utiliser l'architecture représentée dans cette figure. Votre machine physique sera la machine M, dans laquelle une machine virtuelle Kathará (notée VM dans la figure) sera active. La machine M a des adresses IP et du routage configurés.
 
-Dans le rectangle vert-clair à droite de l'image, vous aurez l'architecture qui doit se trouver dans un lab Kathara, situé dans la VM Kathara. Le routeur R0, qui vou permet d'accèder à l'Internet sur la machine M, est également configuré.
+Dans le rectangle vert-clair à droite de l'image, vous aurez l'architecture qui doit se trouver dans un lab Kathará, situé dans la VM Kathará. Le routeur R0, qui vou permet d’accéder à l'Internet sur la machine M, est également configuré.
 
-Finalement, le routeur R est celui qui fait le lien entre la VM Kathara et l'infrastructure émulée de l'entreprise.
+Finalement, le routeur R est celui qui fait le lien entre la VM Kathará et l'infrastructure émulée de l'entreprise.
 
 Dans cette SAE, votre but sera de tester l'architecture envisagée par l'entreprise.
 
 ![Figure 2 : L'architecture plus en détail](./assets/architecture_details.png)
 
 Dans la zone "serveurs" (zone supérieure) il y a 2 machines :
+
 - Un serveur `sf` dont l'adresse IP sera la **première adresse de la plage choisie** pour la zone "serveurs" ;
 - Un routeur `r_s` qui aura deux interfaces réseau, l'une liée au routeur `r`, l'autre liée à la zone "serveurs", avec la **dernière adresse de la plage dédiée** à cette zone.
 
 Dans la zone "personnel" (zone au milieu) il y a 3 machines :
+
 - 2 machines utilisateur, `pca` et `pcb`, dont les adresses IP seront les **deux premières adresses de la plage dédiée** à la zone "personnel" ;
 - Un routeur `r_p`, qui aura deux interfaces réseau, l'une liée au routeur `r`, l'autre liée à la zone "personnel", avec une adresse IP qui sera la **dernière de la plage dédiée** de cette zone-là.
 
 Dans la zone "clients" (zone inférieure) il y a 3 machines :
+
 - 2 machines utilisateur, `pcc` et `pcd`, qui doivent recevoir des adresses dynamiquement ;
 - Un routeur `r_c`, lié d'un côté au routeur `r` et d'un autre côté avec une adresse constante (**dernière adresse** de la zone "clients"). Du côté client, **cette machine sert aussi de serveur DHCP**, pour l'adressage dynamique. La plage DHCP choisie devra accueillir un nombre de **200** machines.
 
 La personne qui utilise le `pcb` est souvent avec les clients. Elle se rend compte qu'il serait bien de pouvoir manipuler son ordinateur (`pcb`) à distance à partir de la zone "clients". Elle veut de plus pouvoir déposer et retirer des fichiers, à partir de `pcb`, sur un serveur dédié de la zone "serveurs", notamment le serveur `sf`. Le responsable DSI doit donc lui mettre en place des services lui permettant :
+
 - D'établir un tunnel vers `pcb`, qui de plus sera sécurisé ;
 - De déposer et retirer des fichiers à partir de `pcb` vers le serveur `sf` de façon sécurisée.
 
 ## Questions
 
-### 1. Préparer la simulation Kathara
+### 1. Préparer la simulation Kathará
 
 ![Figure 3 : Proposition d'architecture](./assets/architecture_proposition.png)
 
@@ -101,7 +105,7 @@ alors la plage ira de `172.16.194.1` à `172.16.194.201` (avec un `netmask` de `
 
 #### b.
 
-> Trouvez égalemennt des sous-plages pour la plage des routeurs...
+> Trouvez également des sous-plages pour la plage des routeurs...
 
 - Allant de `r` à `r_s` : `172.16.193.128/25`
 - Allant de `r` à `r_p` : `172.16.193.0/25`
@@ -113,11 +117,12 @@ alors la plage ira de `172.16.194.1` à `172.16.194.201` (avec un `netmask` de `
 
 #### c.
 
-> Analysez comment le routage sera réalisé dans l'architecture décrite, quelles commandes devont être mises sur quelles machines ?
+> Analysez comment le routage sera réalisé dans l'architecture décrite, quelles commandes devront être mises sur quelles machines ?
 
 Il faudra faire du routage sur chaque machine avec `ip route`, par exemple.
 
 Concernant le serveur DHCP, il faudra :
+
 - Installer `isc-dhcp-server` avec `apt`
   - `apt update && apt install -y isc-dhcp-server`
 - Démarrer le service `isc-dhcp-server` après configuration via `systemctl`
@@ -131,6 +136,7 @@ Une fois la configuration terminée, il faudra aussi démarrer son service `vsft
 > Pour le service DHCP, comment mettre en place le service en question ? Préparez le contenu des fichiers de configuration.
 
 Sur la machine `r_c`, il faudra modifier le fichier de configuration du serveur DHCP situé à `/etc/dhcp/dhcpd.conf` pour y écrire le contenu suivant :
+
 ```conf
 ddns-update-style none;
 
@@ -145,6 +151,7 @@ subnet 172.16.194.0 netmask 255.255.254.0 {
 ```
 
 Il y a aussi le fichier situé à `/etc/default/isc-dhcp-server` qu'il faut éditer :
+
 ```bash
 # On utilise uniquement les configurations requises (IPv4)
 DHCPDv4_CONF=/etc/dhcp/dhcpd.conf
@@ -173,6 +180,7 @@ Nous utiliserons SSH.
 > Quelles seront les configurations à faire sur chacune des machines ?
 
 Il faudra configurer :
+
 - les interfaces (`/etc/network/interfaces`) de chaque machine ;
 - le service DHCP sur la machine `r_c` ;
 - le service FTP sur la machine `sf` ;
@@ -180,11 +188,11 @@ Il faudra configurer :
 
 > Comment allez vous les mettre en place ?
 
-En utilisant des fichiers `.startup` qui seront exécutés lors du démarrage de la simulation Kathara.
+En utilisant des fichiers `.startup` qui seront exécutés lors du démarrage de la simulation Kathará.
 
 ### 2.
 
-> Préparer l'émulation Kathara.
+> Préparer l'émulation Kathará.
 
 [Voir le fichier `lab.conf`](./lab.conf)
 
@@ -242,9 +250,57 @@ Voir la configuration [`/etc/vsftpd.conf`](./shared/sf/vsftpd.conf).
 
 ### 7.
 
-> Ouvrez une capture Wireshark sur l'interface faisant le pont de la machine hôte avec Kathara.
+> Ouvrez une capture Wireshark sur l'interface faisant le pont de la machine hôte avec Kathará.
 > Avec la machine hôte, connectez vous à la machine `pcb` en SSH, puis fermez la connexion.
 > Ensuite, en étant connecté à distance, faites un transfert de fichiers sur `sf` puis récupérez un autre fichier à partir de `sf`
 >
 > A partir de cette capture, retrouvez le fonctionnement des deux protocoles utilisés (SSH et FTP).
 
+On va devoir établir une route entre la machine hôte (VM) et la machine `r_p` de Kathará.
+
+```bash
+# On obtient 172.17.0.2 avec l'interface eth3 sur la machine r.
+# On tape cette commande sur la machine hôte.
+sudo ip route add 172.16.196.0/22 via 172.17.0.2
+```
+
+On va se connecter au SSH de `pcb`.
+
+```bash
+ssh admin@172.16.196.2
+# CTRL+D pour se déconnecter
+```
+
+On va devoir établir une route entre la machine hôte (VM) et la machine `r_s` de Kathará.
+
+```bash
+# On obtient 172.17.0.2 avec l'interface eth3 sur la machine r.
+# On tappe cette commande sur la machine hôte.
+sudo ip route add 172.16.192.0/25 via 172.17.0.2
+```
+
+On va créer les fichiers qu'on va se transférer avec `sf`.
+
+```bash
+# Sur la machine locale
+echo "Hello World" > /ftp_example.txt
+```
+
+```bash
+# Sur la machine `sf`
+echo "Hello world from sf!" > /home/admin/flag.txt
+```
+
+On va transférer ce fichier en FTP avec la commande `ftp`.
+
+```bash
+ftp 172.16.192.1
+> Username: admin
+> Password: admin
+# on transfère le fichier local dans /home/admin/ftp_example.txt
+$ put /ftp_example.txt
+# on récupère un fichier de la machine sf pour la mettre en local
+$ get flag.txt
+# on referme
+$ bye
+```
