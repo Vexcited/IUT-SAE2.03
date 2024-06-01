@@ -23,8 +23,8 @@ Par contre, ce que vous allez devoir configurer est une infrastructure interne p
 Comme l'entreprise est en pleine expansion, elle aura besoin de mettre en place une **zone personnel** pour ses développeurs et une **zone clients** qui permettra l'accès des clients au réseau lorsqu'ils visitent l'entreprise.
 L'entreprise choisit d'utiliser une plage privée : P1.P2.P3.P4/n1 (**172.16.192.0/21**), qui sera divisée tel que :
 
-- (au minimum) **950** adresses machine seront utilisées dabs la **zone personnel**
-- (au minimum) **350** adresses machine seront utilisées dans la **zone clients**
+- **950** adresses machine seront utilisées dabs la **zone personnel**
+- **350** adresses machine seront utilisées dans la **zone clients**
 
 En plus, l'entreprise aura besoin de 2 plages d'adresses privées supplémentaires (que vous allez devoir choisir vous-mêmes, en argumentant vos choix) :
 
