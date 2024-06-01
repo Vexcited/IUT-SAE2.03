@@ -49,3 +49,193 @@ On peut ainsi définir les adresses IP suivantes :
     - `r_s` (`eth1`) : `172.16.193.130/25`
     - `r_s` (`eth0`) : `172.16.192.126/25`
       - `sf` (`eth0`) : `172.16.192.1/25`
+
+Pour être connecté à Internet, l'interface `eth3` sur la machine `r` est utilisé.
+Dans notre émulation, elle sera *bridge* et mise en place automatiquement par Kathará.
+
+## Configuration des machines
+
+### Toutes les machines
+
+#### Serveur DNS
+
+Pour toutes les machines, sauf PCD et PCC qui seront configures dynamiquement par le serveur DHCP, nous utiliserons le serveur DNS de [Quad9](https://www.quad9.net/), un DNS ouvert et sécurisé pour une plus grande confidentialité.
+
+Utilisation dans `resolv.conf` :
+```conf
+nameserver 9.9.9.9
+```
+
+Utilisation dans `dhcpd.conf` :
+```conf
+option domain-name-servers 9.9.9.9;
+```
+
+#### Service réseau
+
+Une fois que toute la configuration réseau est faite dans les fichiers de démarrage (`.startup`), on redémarre le service réseau pour que les changements soient pris en compte.
+
+```bash
+/etc/init.d/networking restart
+```
+
+### Machine `r`
+
+On a défini la configuration de son interface dans `/etc/network/interfaces`.
+
+```plaintext
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+address 172.16.193.1
+netmask 255.255.255.128
+post-up ip route add 172.16.196.0/22 via 172.16.193.2
+
+auto eth1
+iface eth1 inet static
+address 172.16.192.129
+netmask 255.255.255.128
+post-up ip route add 172.16.194.0/23 via 172.16.192.130
+
+auto eth2
+iface eth2 inet static
+address 172.16.193.129
+netmask 255.255.255.128
+post-up ip route add 172.16.192.0/23 via 172.16.193.130
+```
+
+On utilise `post-up` pour ajouter des routes statiques après le démarrage de l'interface.
+
+On doit définir une masquerade pour que les machines utilisant `r` comme routeur puissent accéder à Internet.
+
+```bash
+iptables -t nat -A POSTROUTING -o eth3 -j MASQUERADE
+```
+
+On utilise l'interface `eth3` car c'est celle qui est connecté à Internet.
+
+### Machine `r_s`
+
+On a défini la configuration de son interface dans `/etc/network/interfaces`.
+
+```plaintext
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+address 172.16.192.126
+netmask 255.255.255.128
+
+auto eth1
+iface eth1 inet static
+address 172.16.193.130
+netmask 255.255.255.128
+gateway 172.16.193.129
+```
+
+### Machine `r_p`
+
+On a défini la configuration de son interface dans `/etc/network/interfaces`.
+
+```plaintext
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+address 172.16.199.254
+netmask 255.255.252.0
+
+auto eth1
+iface eth1 inet static
+address 172.16.193.2
+netmask 255.255.255.128
+gateway 172.16.193.1
+```
+
+### Machine `r_c`
+
+On a défini la configuration de son interface dans `/etc/network/interfaces`.
+
+```plaintext
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+address 172.16.195.254
+netmask 255.255.254.0
+
+auto eth1
+iface eth1 inet static
+address 172.16.192.130
+netmask 255.255.255.128
+gateway 172.16.192.129
+```
+
+Sur cette machine, nous devons également mettre en place un serveur DHCP pour les machines `pcc` et `pcd`.
+
+Nous avons donc installé le paquet `isc-dhcp-server` pour mettre en place le serveur DHCP en utilisant la commande suivante en tant que `root` : `apt update && apt install -y isc-dhcp-server`.
+
+Pour effectuer la configuration du serveur DHCP, nous avons modifié le fichier `/etc/dhcp/dhcpd.conf` pour y écrire la configuration suivante :
+
+```conf
+ddns-update-style none;
+
+# Réseau de `r_c` : "172.16.194.0/23".
+subnet 172.16.194.0 netmask 255.255.254.0 {
+  range 172.16.194.1 172.16.194.201;
+  option routers 172.16.195.254;
+  option domain-name-servers 9.9.9.9;
+  default-lease-time 21600;
+  max-lease-time 43200;
+}
+```
+
+Nous devons aussi modifier le fichier `/etc/default/isc-dhcp-server` pour utiliser seulement IPv4 et l'interface `eth0` :
+
+```conf
+DHCPDv4_CONF=/etc/dhcp/dhcpd.conf
+DHCPDv4_PID=/var/run/dhcpd.pid
+INTERFACESv4="eth0"
+```
+
+Enfin, on démarre le service DHCP avec la commande suivante : `systemctl start isc-dhcp-server`.
+
+### Machine `sf`
+
+(TODO)
+
+### Machine `pcb`
+
+(TODO)
+
+### Machine `pca`
+
+On a défini la configuration de son interface dans `/etc/network/interfaces`.
+
+```plaintext
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+address 172.16.196.1
+netmask 255.255.252.0
+gateway 172.16.199.254
+```
+
+### Machine `pcc` et `pcd`
+
+On a défini la configuration de son interface dans `/etc/network/interfaces` en utilisant `dhcp` pour que l'adresse IP soit attribuée dynamiquement par le serveur DHCP.
+
+```plaintext
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet dhcp
+```
