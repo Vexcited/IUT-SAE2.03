@@ -314,3 +314,60 @@ iface lo inet loopback
 auto eth0
 iface eth0 inet dhcp
 ```
+
+## Tests
+
+Pour tester la configuration du réseau, on a utilisé la commande `ping` pour vérifier la connectivité entre les machines.
+
+## Services
+
+### Accès à distance
+
+Pour permettre l'accès à distance à `pcb`, on utilise le protocole SSH (Secure Shell).
+SSH est un protocole de communication sécurisé (les données sont chiffrées) qui permet d'accéder à une machine à distance et d'exécuter des commandes sur cette machine.
+
+Pour se connecter à l'utilisateur `admin` de `pcb`, on utilise la commande suivante :
+
+```bash
+ssh admin@<addresse_de_pcb>
+```
+
+Ce service tourne sur le port 22, par défaut.
+
+![Figure 3 : Capture Wireshark SSH](./assets/wireshark_ssh.png)
+
+On remarque sur cette capture Wireshark que le protocole SSHv2 est utilisé pour établir une connexion à distance avec `pcb`.
+
+1. Les deux machines échangent leur version du protocole SSH (SSHv2) : `Client: Protocol` et `Server: Protocol` ;
+2. Les deux machines échangent des clés pour établir une connexion sécurisée : `Client: Key Exchange Init` et `Server: Key Exchange Init` ;
+3. Le client envoie la clé de chiffrement au serveur : `Client: Elliptic Curve Diffie-Hellman Client Key Exchange Init` ;
+4. Le serveur valide la réception de la clé de chiffrement et envoie une clé au client : `Server: Elliptic Curve Diffie-Hellman Server Key Exchange Reply, New Keys` ;
+5. Le client accuse la réception de la clé : `Client: New Keys` ;
+6. Tous les messages sont ensuite chiffrés et envoyés de manière sécurisée.
+
+### Transfert de fichiers
+
+Pour permettre le transfert de fichiers entre `pcb` et `sf`, on utilise le protocole FTP (File Transfer Protocol).
+
+Nous avons choisi le serveur FTP `vsftpd` pour sa simplicité d'utilisation et sa sécurité (d'où le nom "Very Secure FTP Daemon").
+
+Pour se connecter à `sf`, on utilise la commande suivante :
+
+```bash
+ftp <addresse_de_sf>
+# On nous demande le nom d'utilisateur et le mot de passe.
+# On se connecte avec l'utilisateur "admin" et le mot de passe "admin".
+# On peut ensuite utiliser les commandes FTP pour transférer des fichiers :
+# - `put` pour envoyer un fichier.
+# - `get` pour récupérer un fichier.
+# - `ls` pour lister les fichiers.
+# - `cd` pour changer de répertoire.
+# - `pwd` pour afficher le répertoire courant.
+# - `bye` pour quitter le serveur FTP.
+```
+
+Ce service tourne sur le port 21, par défaut.
+
+![Figure 4 : Capture Wireshark FTP](./assets/wireshark_ftp.png)
+
+On remarque sur cette capture Wireshark que le protocole FTP est utilisé pour transférer des fichiers entre `pcb` et `sf`. Lorsqu'on transfère un fichier, le protocole `FTP-DATA` est utilisé pour envoyer les données du fichier.
