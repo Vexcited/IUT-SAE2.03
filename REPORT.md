@@ -207,11 +207,86 @@ Enfin, on démarre le service DHCP avec la commande suivante : `systemctl start 
 
 ### Machine `sf`
 
-(TODO)
+On a défini la configuration de son interface dans `/etc/network/interfaces`.
+
+```plaintext
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+address 172.16.192.1
+netmask 255.255.255.128
+gateway 172.16.192.126
+```
+
+On doit créer un utilisateur que l'on va utiliser pour se connecter au serveur FTP.
+
+```bash
+useradd -m admin
+echo "admin:admin" | chpasswd
+```
+
+On installe le serveur FTP : `vsftpd` (Very Secure FTP Daemon).
+
+```bash
+apt update && apt install -y vsftpd
+```
+
+On doit effectuer la configuration du service FTP en modifiant le fichier `/etc/vsftpd.conf` pour y écrire la configuration suivante :
+
+```conf
+listen=YES
+listen_ipv6=NO
+anonymous_enable=NO
+local_enable=YES
+write_enable=YES
+dirmessage_enable=YES
+use_localtime=YES
+xferlog_enable=YES
+connect_from_port_20=YES
+secure_chroot_dir=/var/run/vsftpd/empty
+pam_service_name=vsftpd
+rsa_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+rsa_private_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+ssl_enable=NO
+```
+
+Ici, on désactive la connexion anonyme, on active la connexion locale et l'écriture.
+
+Finalement, on démarre le service FTP avec la commande suivante : `/etc/init.d/vsftpd start`.
 
 ### Machine `pcb`
 
-(TODO)
+On a défini la configuration de son interface dans `/etc/network/interfaces`.
+
+```plaintext
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+address 172.16.196.2
+netmask 255.255.252.0
+gateway 172.16.199.254
+```
+
+Sur cette machine, on doit mettre en place un serveur SSH pour permettre la connexion à distance.
+On a déjà le serveur SSH installé par défaut sur la machine, il faut juste le démarrer avec la commande suivante : `systemctl start sshd`.
+
+On doit créer un utilisateur que l'on va utiliser pour se connecter à distance.
+
+```bash
+# On ajoute l'utilisateur "admin" avec le mot de passe "admin".
+useradd -m admin
+echo "admin:admin" | chpasswd
+```
+
+On installe aussi un client FTP qui sera utilisé pour accéder au serveur FTP de `sf`.
+
+```bash
+apt update && apt install -y ftp
+```
 
 ### Machine `pca`
 
