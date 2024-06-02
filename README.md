@@ -238,7 +238,7 @@ apt update && apt install -y vsftpd
 
 Voir la configuration [`/etc/vsftpd.conf`](./shared/sf/vsftpd.conf).
 
-### 6.
+### 6.
 
 > A partir de ce moment, les tests suivant doivent marcher :
 
