@@ -195,6 +195,8 @@ subnet 172.16.194.0 netmask 255.255.254.0 {
 }
 ```
 
+Le serveur DHCP doit pouvoir attribuer 200 IPs, donc la `range` est définie de `.1` à `.201` pour avoir 200 IPs de disponibles.
+
 Nous devons aussi modifier le fichier `/etc/default/isc-dhcp-server` pour utiliser seulement IPv4 et l'interface `eth0` :
 
 ```conf
