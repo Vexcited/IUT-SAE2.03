@@ -5,7 +5,7 @@ cp /shared/sf/interfaces /etc/network/interfaces
 # On redémarre le service réseau.
 /etc/init.d/networking restart
 
-# On ajoute l'utilisateur qui accèdera au client FTP.
+# On ajoute l'utilisateur qui accédera au client FTP.
 useradd -m admin
 echo "admin:admin" | chpasswd
 
