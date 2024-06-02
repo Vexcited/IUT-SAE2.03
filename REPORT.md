@@ -27,11 +27,11 @@ La zone "personnel" doit pouvoir contenir **950** machines et la zone "clients" 
 
 Après étude du problème, on a besoin de 6 sous-réseaux différents pour mettre en place l'architecture demandée.
 
-![Figure 2 : Déstructuration de l'IP](./assets/ip_destructuration.png)
+![Figure 1 : Déstructuration de l'IP](./assets/ip_destructuration.png)
 
 Voici une proposition d'architecture pour répondre au problème posé.
 
-![Figure 1 : Proposition d'architecture](./assets/architecture_proposition.png)
+![Figure 2 : Proposition d'architecture](./assets/architecture_proposition.png)
 
 On peut ainsi définir les adresses IP suivantes :
 
@@ -317,7 +317,103 @@ iface eth0 inet dhcp
 
 ## Tests
 
-Pour tester la configuration du réseau, on a utilisé la commande `ping` pour vérifier la connectivité entre les machines.
+### Connectivité
+
+Pour tester la configuration du réseau, on a utilisé un script bash qui utilise la commande `ping` pour vérifier la connectivité entre les machines.
+
+```bash
+#!/bin/bash
+
+# Définition des adresses IP et des noms des machines
+declare -A machines=(
+  ["r(eth0)"]="172.16.193.1"
+  ["r(eth1)"]="172.16.192.129"
+  ["r(eth2)"]="172.16.193.129"
+  ["r_p(eth0)"]="172.16.199.254"
+  ["r_p(eth1)"]="172.16.193.2"
+  ["r_c(eth0)"]="172.16.195.254"
+  ["r_c(eth1)"]="172.16.192.130"
+  ["r_s(eth0)"]="172.16.192.126"
+  ["r_s(eth1)"]="172.16.193.130"
+  ["pca(eth0)"]="172.16.196.1"
+  ["pcb(eth0)"]="172.16.196.2"
+  ["sf(eth0)"]="172.16.192.1"
+  ["internet"]="1.1.1.1"
+)
+
+# Fonction pour vérifier l'accessibilité de chaque machine
+check_connectivity() {
+  local name=$1
+  local ip=$2
+
+  if ping -c 1 -W 1 "$ip" > /dev/null 2>&1; then
+    echo "OK: $name est accessible"
+  else
+    echo "KO: $name ($ip) n'est pas accessible"
+  fi
+}
+
+# Parcourir les machines et vérifier leur accessibilité
+for name in "${!machines[@]}"; do
+  check_connectivity "$name" "${machines[$name]}"
+done
+```
+
+![Figure 3 : Résultat des tests de connectivité](./assets/pinger_results.png)
+
+On peut voir que toutes les machines peuvent communiquer entre elles et l'Internet.
+
+### SSH
+
+On peut vérifier que le service SSH fonctionne sur pcb en utilisant la commande `systemctl status sshd`. On observe `Active: active (running)` ce qui signifie que le service SSH est en cours d'exécution.
+
+Pour tester une connexion au service SSH, on a utilisé la commande `ssh` pour se connecter à distance à la machine `pcb`.
+
+```bash
+ssh admin@172.16.196.2
+```
+
+![Figure 4 : Connexion SSH](./assets/ssh_result.png)
+
+### FTP
+
+On peut vérifier que le service FTP fonctionne sur sf en utilisant la commande `/etc/init.d/vsftpd status`. On obtient `FTP server is running.` ce qui signifie que le service FTP est en cours d'exécution.
+
+Pour tester une connexion au service FTP, on a utilisé la commande `ftp` pour se connecter à distance à la machine `sf`.
+
+```bash
+ftp 172.16.192.1
+```
+
+On a ensuite utilisé les commandes FTP pour transférer un fichier, premièrement de notre machine vers `sf` (`/ftp_example.txt`), puis deuxièmement de `sf` vers notre machine (`flag.txt`).
+
+```console
+Connected to 172.16.192.1.
+220 (vsFTPd 3.0.3)
+Name (172.16.192.1:iut): admin
+331 Please specify the password.
+Password:
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+
+ftp> put /ftp_example.txt
+local: /ftp_example.txt remote: /ftp_example.txt
+200 PORT command successful. Consider using PASV.
+150 Ok to send data.
+226 Transfer complete.
+12 bytes sent in 0.00 secs (133.1676 kB/s)
+
+ftp> get flag.txt
+local: flag.txt remote: flag.txt
+200 PORT command successful. Consider using PASV.
+150 Opening BINARY mode data connection for flag.txt (21 bytes).
+226 Transfer complete.
+21 bytes received in 0.00 secs (49.5358 kB/s)
+
+ftp> bye
+221 Goodbye.
+```
 
 ## Services
 
@@ -329,12 +425,12 @@ SSH est un protocole de communication sécurisé (les données sont chiffrées) 
 Pour se connecter à l'utilisateur `admin` de `pcb`, on utilise la commande suivante :
 
 ```bash
-ssh admin@<addresse_de_pcb>
+ssh admin@172.16.196.2
 ```
 
 Ce service tourne sur le port 22, par défaut.
 
-![Figure 3 : Capture Wireshark SSH](./assets/wireshark_ssh.png)
+![Figure 5 : Capture Wireshark SSH](./assets/wireshark_ssh.png)
 
 On remarque sur cette capture Wireshark que le protocole SSHv2 est utilisé pour établir une connexion à distance avec `pcb`.
 
@@ -354,7 +450,7 @@ Nous avons choisi le serveur FTP `vsftpd` pour sa simplicité d'utilisation et s
 Pour se connecter à `sf`, on utilise la commande suivante :
 
 ```bash
-ftp <addresse_de_sf>
+ftp 172.16.192.1
 # On nous demande le nom d'utilisateur et le mot de passe.
 # On se connecte avec l'utilisateur "admin" et le mot de passe "admin".
 # On peut ensuite utiliser les commandes FTP pour transférer des fichiers :
@@ -368,6 +464,26 @@ ftp <addresse_de_sf>
 
 Ce service tourne sur le port 21, par défaut.
 
-![Figure 4 : Capture Wireshark FTP](./assets/wireshark_ftp.png)
+![Figure 6 : Capture Wireshark FTP](./assets/wireshark_ftp.png)
 
 On remarque sur cette capture Wireshark que le protocole FTP est utilisé pour transférer des fichiers entre `pcb` et `sf`. Lorsqu'on transfère un fichier, le protocole `FTP-DATA` est utilisé pour envoyer les données du fichier.
+
+## Glossaire
+
+- **FTP** : File Transfer Protocol, un protocole de transfert de fichiers.
+- **SSH** : Secure Shell, un protocole de communication sécurisé.
+- **DHCP** : Dynamic Host Configuration Protocol, un protocole de configuration automatique des adresses IP.
+- **DNS** : Domain Name System, un système de noms de domaine.
+- **Quad9** : Un serveur DNS ouvert et sécurisé.
+- **vsftpd** : Very Secure FTP Daemon, un serveur FTP sécurisé.
+- **Wireshark** : Un analyseur de paquets réseau.
+- **Kathará** : Un outil d'émulation de réseaux.
+- **IP** : Internet Protocol, un protocole de communication.
+- **CIDR** : Classless Inter-Domain Routing, une notation pour définir des plages d'adresses IP.
+- **MASQUERADE** : Une technique de NAT pour masquer les adresses IP privées.
+- **NAT** : Network Address Translation, une technique pour traduire les adresses IP.
+- **Routeur** : Un équipement réseau pour connecter plusieurs réseaux entre eux.
+- **Serveur** : Une machine qui fournit des services à d'autres machines.
+- **Client** : Une machine qui utilise les services d'un serveur.
+- **Plage d'adresses IP** : Un ensemble d'adresses IP qui peuvent être attribuées à des machines.
+- **Interface réseau** : Un point de connexion d'une machine à un réseau.
